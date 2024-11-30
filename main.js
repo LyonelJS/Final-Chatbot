@@ -483,6 +483,7 @@ function clearChatHistory() {
   
   function hidePrompts(){
     promptContainer.classList.add('invisible');
+    showPromptButton.classList.remove('hidden')
     showPromptButton.innerHTML = '?'
   };
   
