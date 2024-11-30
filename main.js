@@ -39,6 +39,7 @@ let messages = [];
 // Apply saved width on page load
 chatContainer.style.width = `${chatContainerWidth}px`;
 historySideBar.style.width = `calc(100% - ${chatContainerWidth}px - 5px)`; // Adjust for divider width
+scrollButton.style.marginLeft = `calc(${chatContainerWidth}px/2 - 2%)`; // Adjust for divider width
 promptContainer.style.width = `calc(${chatContainerWidth}px - 5%)`;
 
 
