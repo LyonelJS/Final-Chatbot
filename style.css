@@ -291,14 +291,6 @@ nav:hover{
     background-repeat: no-repeat; /* Prevents the image from repeating */
 }
 
-#send-button img{
-    height:20px;
-    width:20px;
-    margin-bottom: 10px;
-    margin-right: 30px;
-    margin-left:0px ;
-}
-
 .hidden {
     display:none;
 }
