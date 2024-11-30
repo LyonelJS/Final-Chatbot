@@ -1,4 +1,4 @@
-const API_KEY = 'AIzaSyBAzKJLyNO5Fbu86aMt2MbYOHNZWZQXbIk'
+const API_KEY = 'AIzaSyCNdQZHu1NjD2la4W_hYCmp71fTXj9zE4Y'
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`
 
 let promptInput = document.querySelector('input[name="prompt"]');
