@@ -246,6 +246,8 @@ const generateAPIResponse = async () => {
 
         // Clear the input box
         promptInput.value = '';
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
       });
 
       // Save the message to chat history
