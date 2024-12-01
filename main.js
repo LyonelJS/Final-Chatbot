@@ -269,7 +269,6 @@ const generateAPIResponse = async () => {
   } catch (error) {
       console.error(error);
   } 
-    promptInput.value = '';
 
 };
 
@@ -317,7 +316,7 @@ function sendMessage() {
 
     generateAPIResponse();
 
-    
+    promptInput.value = '';
 
 };
 
