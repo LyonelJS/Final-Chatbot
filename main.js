@@ -1,4 +1,4 @@
-const API_KEY = 'AIzaSyCNdQZHu1NjD2la4W_hYCmp71fTXj9zE4Y'
+const API_KEY = 'AIzaSyBAzKJLyNO5Fbu86aMt2MbYOHNZWZQXbIk'
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`
 
 let promptInput = document.querySelector('input[name="prompt"]');
@@ -36,11 +36,13 @@ let initialWidth;
 let chatContainerWidth = parseInt(localStorage.getItem('chatContainerWidth')) || chatContainer.offsetWidth; 
 let messages = [];
 
+if (window.innerWidth >= 480) {
+
 // Apply saved width on page load
 chatContainer.style.width = `${chatContainerWidth}px`;
 historySideBar.style.width = `calc(100% - ${chatContainerWidth}px - 5px)`; // Adjust for divider width
-scrollButton.style.marginLeft = `calc(${chatContainerWidth}px/2 - 2%)`; // Adjust for divider width
 promptContainer.style.width = `calc(${chatContainerWidth}px - 5%)`;
+scrollButton.style.marginLeft = `calc(${chatContainerWidth}px/2 - 2%)`; // Adjust for divider width
 
 
 divider.addEventListener('mousedown', (e) => {
@@ -81,15 +83,16 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => {
   isDragging = false;
 });
-
+}
 
 
   // Adjust divider behavior for smaller screens
 if (window.innerWidth < 480) {
     historySideBar.style.width = `100%`;
     chatContainer.style.width = `100%`;
-    promptContainer.style.width = '81%';
+    promptContainer.style.width = '80%';
     divider.style.visibility = 'hidden';
+    
 }
 
 // Create new chat and saving the previous one to history
@@ -190,6 +193,7 @@ const showTypingEffect = (text, textElement, callback) => {
 
     if(currentWordIndex === words.length || stop === true) {
       clearInterval(typingInterval);
+      userInputBox.focus();
 
       if (callback) callback(); // Execute the callback when typing is done
 
@@ -245,16 +249,17 @@ const generateAPIResponse = async () => {
         refreshHistoryItem();
         updateActiveHistoryItem();
 
+        const botResponse = botResponseDiv.textContent
+
+        // Save the message to chat history
+        const botMessageObj = { sender: "bot", message: botResponse };
+        chatHistory[currentChatIndex].messages.push(botMessageObj);
+        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+
         // Clear the input box
-        
         chatContainer.scrollTop = chatContainer.scrollHeight;
-
+        
       });
-
-      // Save the message to chat history
-      const botMessageObj = { sender: "bot", message: apiResponse };
-      chatHistory[currentChatIndex].messages.push(botMessageObj);
-      localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
 
       // Scroll to the latest message
       chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -269,6 +274,7 @@ const generateAPIResponse = async () => {
   } catch (error) {
       console.error(error);
   } 
+    
 
 };
 
@@ -299,8 +305,6 @@ function sendMessage() {
           messages = tempContext;
           });
           
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
     userInputMessage = promptInput.value
     output.innerHTML += `<div class='user-message'><b>You: </b><br>${userInput}</div>`
 
@@ -312,6 +316,8 @@ function sendMessage() {
       
       // Display "Generating..." below the user input
       output.innerHTML += '<div class="generating-message">Dok is Thinking...</div>';
+
+      chatContainer.scrollTop = chatContainer.scrollHeight;
 
     generateAPIResponse();
 
@@ -419,8 +425,6 @@ function clearChatHistory() {
   
   stopButton.addEventListener('click', () => {
     stop = true
-    userInputBox.focus();
-
   }
   );
   
