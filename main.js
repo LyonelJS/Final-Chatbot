@@ -228,7 +228,7 @@ const generateAPIResponse = async () => {
       // Append the container to the output
       output.appendChild(botResponseDiv);
       // Add the formatted text to the container
-      botResponseDiv.innerHTML += `<b>Dok: </b>`;
+      botResponseDiv.innerHTML += `<b>Dok: </b><br>`;
 
       // Typing effect
       showTypingEffect(apiResponse, botResponseDiv, () => {
@@ -303,7 +303,7 @@ function sendMessage() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
     userInputMessage = promptInput.value
-    output.innerHTML += `<div class='user-message'><b>You: </b>${userInput}</div>`
+    output.innerHTML += `<div class='user-message'><b>You: </b><br>${userInput}</div>`
 
     const userMessage = { sender: "user", message: userInput};
 
