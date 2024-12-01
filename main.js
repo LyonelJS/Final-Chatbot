@@ -152,7 +152,7 @@ function startNewChat() {
         const messageDiv = document.createElement("div");
         messageDiv.classList.add(`${msg.sender}-message`);
         const name = msg.sender === 'bot' ? 'Dok' : 'You'; 
-        messageDiv.innerHTML = `<b>${name}: </b>` + msg.message;
+        messageDiv.innerHTML = `<b>${name}: </b><br>` + msg.message;
         chatMessages.appendChild(messageDiv);
     });
     // Change color for the active chat in the sidebar (highlight the current chat)
