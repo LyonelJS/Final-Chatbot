@@ -243,6 +243,8 @@ const generateAPIResponse = async () => {
         // Refresh UI
         refreshHistoryItem();
         updateActiveHistoryItem();
+        userInputBox.focus();
+
 
         // Clear the input box
         
