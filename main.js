@@ -190,6 +190,8 @@ const showTypingEffect = (text, textElement, callback) => {
 
     if(currentWordIndex === words.length || stop === true) {
       clearInterval(typingInterval);
+      userInputBox.focus();
+
       if (callback) callback(); // Execute the callback when typing is done
 
     }
@@ -243,8 +245,6 @@ const generateAPIResponse = async () => {
         // Refresh UI
         refreshHistoryItem();
         updateActiveHistoryItem();
-        userInputBox.focus();
-
 
         // Clear the input box
         
