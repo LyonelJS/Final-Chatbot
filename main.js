@@ -30,7 +30,7 @@ const historySideBar = document.getElementById('history-sidebar');
 let isDragging = false;
 let initialX;
 let initialWidth;
-
+let minWidthReached = false;
 
 // Load chatContainer width from local storage or default
 let chatContainerWidth = parseInt(localStorage.getItem('chatContainerWidth')) || chatContainer.offsetWidth; 
@@ -49,42 +49,60 @@ divider.addEventListener('mousedown', (e) => {
   isDragging = true;
   initialX = e.clientX;
   initialWidth = chatContainer.offsetWidth;
+  
 });
 
 document.addEventListener('mousemove', (e) => {
   if (!isDragging) return;
 
-  const offsetX = e.clientX - initialX;
-  const newWidth = initialWidth - offsetX;
+  // Get the parent container's width
+  const parentWidth = chatContainer.parentElement.offsetWidth;
 
+  // Calculate 20% of the parent width
+  const minWidth = 0.2 * parentWidth;
+  const maxWidth = 0.91 * parentWidth;
+
+
+  const offsetX = e.clientX - initialX;
+  let newWidth = initialWidth - offsetX;
+
+  // Ensure newWidth does not go below 20% of parent width
+  if (newWidth < minWidth) {
+    newWidth = minWidth;
+  }
+
+  // Ensure newWidth does not exceed 80% of parent width
+  if (newWidth > maxWidth) {
+    newWidth = maxWidth;
+
+    // Change the buttons to images when maxWidth is reached
+    newChatButton.innerHTML = ''; // Clear existing text
+    newChatButton.innerHTML = '<img src="newChatButton.png" alt="New Chat" style="width: 50%; height: auto;">';
+
+    clearHistoryButton.innerHTML = ''; // Clear existing text
+    clearHistoryButton.innerHTML = '<img src="deleteChatButton.png" alt="Clear History" style="width: 50%; height: auto;">';
+  } else {
+    newChatButton.innerHTML = 'New Chat'; // Clear existing text
+
+    clearHistoryButton.innerHTML = 'Clear History'; // Clear existing text
+  }
+
+  // Update styles with the constrained newWidth
   chatContainer.style.width = `${newWidth}px`;
   historySideBar.style.width = `calc(100% - ${newWidth}px - 5px)`; // Adjust for divider width
-  scrollButton.style.marginLeft = `calc(${newWidth}px/2 - 2%)`; // Adjust for divider width
+  scrollButton.style.marginLeft = `calc(${newWidth}px / 2 - 2%)`; // Adjust for divider width
   promptContainer.style.width = `calc(${newWidth}px - 5%)`;
 
-  // Save the new width to local storage
+  // Save the constrained width to local storage
   chatContainerWidth = newWidth;
   localStorage.setItem('chatContainerWidth', chatContainerWidth); 
-  if (newWidth < 550) {
-    hidePrompts();
-    showPromptButton.classList.add('hidden')
-  } else {
-    checkUserMessage();
-  }
-
-  if (newWidth < 200) { // Example threshold of 200px
-    scrollButton.classList.add('hidden');
-  } else {
-    scrollButton.classList.remove('hidden');
-  }
-
+  checkContainerWidth(newWidth);
 });
 
 document.addEventListener('mouseup', () => {
   isDragging = false;
 });
-}
-
+};
 
   // Adjust divider behavior for smaller screens
 if (window.innerWidth < 480) {
@@ -354,9 +372,8 @@ function clearChatHistory() {
     chatHistory.forEach((chat, index) => {
       const historyItem = document.createElement("a");
       const firstUserMessage = chat.messages.find(msg => msg.sender === "user")?.message || '';
-      const cutMessage = firstUserMessage.length > 50 ? firstUserMessage.substring(0, 50) + '...' : firstUserMessage;
   
-      historyItem.innerHTML = `<strong>Chat ${index + 1}</strong>: ${cutMessage}`;
+      historyItem.innerHTML = `<strong>Chat ${index + 1}</strong>: ${firstUserMessage}`;
       historyItem.href = "#";
       historyItem.classList.add("history-item");
   
@@ -482,12 +499,23 @@ function clearChatHistory() {
       showPrompts();
     } else {
       hidePrompts();
+
     }
   }
   
+  function checkContainerWidth(width){
+    if (width < 550) {
+      hidePrompts();
+      showPromptButton.classList.add('hidden')
+    } else {
+      checkUserMessage();
+      showPromptButton.classList.remove('hidden');
+    }
+  
+  };  
+
   function hidePrompts(){
     promptContainer.classList.add('invisible');
-    showPromptButton.classList.remove('hidden')
     showPromptButton.innerHTML = '?'
   };
   
@@ -532,6 +560,7 @@ function clearChatHistory() {
   });
   
     // Load history when the page is loaded
+  checkContainerWidth(chatContainerWidth);
   checkScroll();
   loadHistory();
   disableSend();  

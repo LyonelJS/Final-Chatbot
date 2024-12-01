@@ -128,6 +128,7 @@ nav:hover{
 
 .history-sidebar {
     width: 25%;
+    min-width:8%;
     background-color: #fff;
     padding: 15px;
     border-radius: 8px;
@@ -167,7 +168,15 @@ nav:hover{
 .history-sidebar button:hover {
     background-color: #0056b3;
 }
-
+.history-item {
+    display: block;
+    white-space: nowrap; /* Prevents text from wrapping to a new line */
+    overflow: hidden; /* Hides any overflow */
+    text-overflow: ellipsis; /* Adds '...' at the end of truncated text */
+    max-width: 100%; /* Ensures it does not exceed the container width */
+    text-decoration: none; /* Optional: removes underline */
+  }
+  
 .history-item.active-chat{
     color:#fff;
     background-color:#007bff;
@@ -207,6 +216,7 @@ nav:hover{
     scroll-behavior: smooth; /* This enables smooth scrolling */
 
 }
+
 #chat-messages {
     display: flex;
     flex-direction: column;
@@ -313,6 +323,10 @@ nav:hover{
     margin-top: 30%;
     position:fixed;
     z-index: 10;
+    background-image: url('scrollButton.png');
+    background-position: center; /* Centers the image */
+    background-size: 20px, 20px;
+    background-repeat: no-repeat; /* Prevents the image from repeating */
 }
 .super-container{
     background-color:#fff;
