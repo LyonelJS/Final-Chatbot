@@ -255,7 +255,7 @@ const generateAPIResponse = async () => {
       const botMessageObj = { sender: "bot", message: apiResponse };
       chatHistory[currentChatIndex].messages.push(botMessageObj);
       localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
-promptInput.value = '';
+
       // Scroll to the latest message
       chatContainer.scrollTop = chatContainer.scrollHeight;
 
@@ -269,7 +269,7 @@ promptInput.value = '';
   } catch (error) {
       console.error(error);
   } 
-    
+    promptInput.value = '';
 
 };
 
