@@ -236,7 +236,6 @@ const generateAPIResponse = async () => {
         historyContainer.classList.remove('disabled');
         newChatButton.classList.remove('disabled');
         clearHistoryButton.classList.remove('disabled');
-        userInputBox.classList.remove('disabled');
         stopButton.classList.add('hidden');
         sendButton.classList.remove('hidden');
         stop = false;
@@ -285,7 +284,6 @@ function sendMessage() {
     historyContainer.classList.add('disabled');
     newChatButton.classList.add('disabled');
     clearHistoryButton.classList.add('disabled');
-    userInputBox.classList.add('disabled');
     sendButton.classList.add('disabled');
     stopButton.classList.remove('hidden');
     sendButton.classList.add('hidden');
