@@ -190,7 +190,6 @@ const showTypingEffect = (text, textElement, callback) => {
 
     if(currentWordIndex === words.length || stop === true) {
       clearInterval(typingInterval);
-      userInputBox.focus();
 
       if (callback) callback(); // Execute the callback when typing is done
 
@@ -420,6 +419,8 @@ function clearChatHistory() {
   
   stopButton.addEventListener('click', () => {
     stop = true
+    userInputBox.focus();
+
   }
   );
   
