@@ -517,7 +517,8 @@ function clearChatHistory() {
   })
   
   stopButton.addEventListener('click', () => {
-    stop = true
+    stop = true;
+    userInputBox.focus();
   }
   );
   
