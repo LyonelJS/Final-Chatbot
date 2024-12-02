@@ -84,7 +84,7 @@ document.addEventListener('mousemove', (e) => {
   } else {
     newChatButton.innerHTML = 'New Chat'; // Clear existing text
 
-    clearHistoryButton.innerHTML = 'Clear History'; // Clear existing text
+    clearHistoryButton.innerHTML = 'Delete History'; // Clear existing text
   }
 
   // Update styles with the constrained newWidth
@@ -343,27 +343,103 @@ function sendMessage() {
 
 };
 
-// Clear the chat history (using the clear history button)
+
+// Function to delete individual chat history items
 function clearChatHistory() {
-    hidePrompts();
-    showPromptButton.classList.add('hidden');
-    // Clear chat messages from the chat message div
-    chatMessages.innerHTML = `<div class="chatbot-message bot-message">No history available. Start a new chat!</div>`;
-    
-    // Clear history from the local storage
-    chatHistory = [];
-    localStorage.removeItem('chatHistory');
-    localStorage.removeItem('currentChatIndex');
-    
-    
-    // Remove all chat history tab from the sidebar
-    historyContainer.innerHTML = '';
-    
-    // Update the current chat index (-1 is none)
-    currentChatIndex = -1;
-    userInputBox.classList.add('disabled');
-    sendButton.classList.add('disabled');
-    }
+  
+
+  // Indicate to the user to select a history item to delete
+  const instruction = document.createElement('div');
+  instruction.classList.add('instruction');
+  instruction.innerText = 'Click on a chat history item to delete it or press Cancel to exit.';
+  historyContainer.prepend(instruction);
+
+  // Create a cancel button
+  const cancelButton = document.createElement('button');
+  cancelButton.classList.add('cancel-button');
+  cancelButton.innerText = 'Cancel';
+  historyContainer.prepend(cancelButton);
+  clearHistoryButton.classList.add('hidden')
+
+  // Disable the button to prevent multiple clicks
+  clearHistoryButton.disabled = true;
+  let previousChatIndex = currentChatIndex
+  // Add click event listeners to history items for deletion
+  const allHistoryItems = document.querySelectorAll('.history-item');
+  allHistoryItems.forEach((historyItem, index) => {
+      historyItem.classList.add('deletable')
+
+      historyItem.addEventListener('click', function deleteHistoryItem() {
+
+          // Remove selected chat from chatHistory array
+          chatHistory.splice(index, 1);
+
+          // Update the local storage with the new chat history
+          localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+            
+          // Update currentChatIndex based on the relative position of the deleted chat
+      if (previousChatIndex === index) {
+        if (previousChatIndex > chatHistory.length -1 ){
+          currentChatIndex = chatHistory.length-1; // Reset index if the current chat is deleted
+
+        } else if (previousChatIndex <= chatHistory.length -1){
+          currentChatIndex = previousChatIndex;
+        }
+        else if (currentChatIndex === -1) {
+          chatMessages.innerHTML = `<div class="chatbot-message bot-message">No history available. Start a new chat!</div>`;
+          hidePrompts();
+          showPromptButton.classList.add('hidden');
+          sendButton.classList.add('disabled');
+          userInputBox.classList.add('disabled');
+          userInputBox.value = '';
+          newChatButton.focus();
+        }
+      } else if (previousChatIndex < index) {
+        currentChatIndex = previousChatIndex; // No change if the deleted chat is after the current chat
+      } else if (previousChatIndex > index) {
+        currentChatIndex--; // Shift index if the deleted chat is before the current chat
+        currentChatIndex = previousChatIndex - 1
+      }
+
+          // Update the UI
+          refreshHistoryItem();
+          updateActiveHistoryItem();
+          localStorage.setItem('currentChatIndex', currentChatIndex);
+
+          // Remove instruction and cancel button, re-enable the button
+          instruction.remove();
+          cancelButton.remove();
+          clearHistoryButton.disabled = false;
+
+          // Remove the event listener after the item is deleted
+          historyItem.removeEventListener('click', deleteHistoryItem);
+          clearHistoryButton.classList.remove('hidden')
+          historyItem.classList.remove('deletable')
+
+
+      });
+  });
+
+  // Add event listener to the cancel button
+  cancelButton.addEventListener('click', function cancelDeletionMode() {
+      // Remove instruction and cancel button
+      instruction.remove();
+      cancelButton.remove();
+      clearHistoryButton.classList.remove('hidden')
+      refreshHistoryItem();
+      updateActiveHistoryItem();
+
+      // Re-enable the clear history button
+      clearHistoryButton.disabled = false;
+
+      // Remove the click event listeners from history items
+      allHistoryItems.forEach((historyItem) => {
+          historyItem.replaceWith(historyItem.cloneNode(true)); // Clone and replace to remove listeners
+          historyItem.classList.remove('deletable')
+      });
+  });
+}
+
     
   // Renamed function that updates the chat history view dynamically
   function refreshHistoryItem() {

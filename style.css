@@ -396,6 +396,17 @@ nav:hover{
 #show-prompts:hover {
     background-color: #0056b3;
 }
+.deletable:hover {
+    background-color: red !important; /* Highlight with a soft red */
+  }
+  
+  .cancel-button {
+    background-color: red !important; /* Warning color */
+  }
+  .cancel-button:hover {
+    background-color: #CD5C5C !important; /* Warning color */
+  }
+  
 
 @media (max-width: 480px) {
     nav {
