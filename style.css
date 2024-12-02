@@ -400,10 +400,18 @@ nav:hover{
     background-color: red !important; /* Highlight with a soft red */
   }
   
-  .cancel-button {
+  #cancel-button {
     background-color: red !important; /* Warning color */
   }
-  .cancel-button:hover {
+  #cancel-button:hover {
+    background-color: #CD5C5C !important; /* Warning color */
+  }
+
+
+#clear-all{
+    background-color:red !important;
+}
+#clear-all:hover {
     background-color: #CD5C5C !important; /* Warning color */
   }
   

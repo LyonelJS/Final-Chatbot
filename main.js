@@ -27,10 +27,12 @@ let currentChatIndex = -1
 const divider = document.getElementById('vertical-divider');
 const chatContainer = document.getElementById('chat-container');
 const historySideBar = document.getElementById('history-sidebar');
+const clearAllButton = document.getElementById('clear-all');
+const cancelButton = document.getElementById('cancel-button');
+
 let isDragging = false;
 let initialX;
 let initialWidth;
-let minWidthReached = false;
 
 // Load chatContainer width from local storage or default
 let chatContainerWidth = parseInt(localStorage.getItem('chatContainerWidth')) || chatContainer.offsetWidth; 
@@ -116,6 +118,8 @@ if (window.innerWidth < 480) {
 // Create new chat and saving the previous one to history
 function startNewChat() {
     showPrompts();
+    clearHistoryButton.classList.remove('disabled');
+
     userInputBox.focus();
     // Clear the current chat messages
     chatMessages.innerHTML = `<div class="chatbot-message bot-message">Hello! How can I assist you today? What would you like to ask?" </div>`;
@@ -172,8 +176,8 @@ function startNewChat() {
     selectedChat.messages.forEach(msg => {
         const messageDiv = document.createElement("div");
         messageDiv.classList.add(`${msg.sender}-message`);
-        const name = msg.sender === 'bot' ? 'Dok' : 'You'; 
-        messageDiv.innerHTML = `<b>${name}: </b><br>` + msg.message;
+        const name = msg.sender === 'bot' ? '' : 'You: <br>';
+        messageDiv.innerHTML = `<b>${name} </b>` + msg.message;
         chatMessages.appendChild(messageDiv);
     });
     // Change color for the active chat in the sidebar (highlight the current chat)
@@ -253,6 +257,7 @@ const generateAPIResponse = async () => {
       // Add the formatted text to the container
       botResponseDiv.innerHTML += `<b>Dok: </b><br>`;
 
+      
       // Typing effect
       showTypingEffect(apiResponse, botResponseDiv, () => {
         // Re-enable UI elements
@@ -267,7 +272,9 @@ const generateAPIResponse = async () => {
         refreshHistoryItem();
         updateActiveHistoryItem();
 
-        const botResponse = botResponseDiv.textContent
+        const botResponse = botResponseDiv.innerHTML
+        let formattedResponse;
+        formattedResponse = botResponse.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 
         // Save the message to chat history
         const botMessageObj = { sender: "bot", message: botResponse };
@@ -347,7 +354,6 @@ function sendMessage() {
 // Function to delete individual chat history items
 function clearChatHistory() {
   
-
   // Indicate to the user to select a history item to delete
   const instruction = document.createElement('div');
   instruction.classList.add('instruction');
@@ -355,14 +361,12 @@ function clearChatHistory() {
   historyContainer.prepend(instruction);
 
   // Create a cancel button
-  const cancelButton = document.createElement('button');
-  cancelButton.classList.add('cancel-button');
-  cancelButton.innerText = 'Cancel';
-  historyContainer.prepend(cancelButton);
+ 
+  cancelButton.classList.remove('hidden');
   clearHistoryButton.classList.add('hidden')
 
-  // Disable the button to prevent multiple clicks
-  clearHistoryButton.disabled = true;
+  clearAllButton.classList.remove('hidden');
+
   let previousChatIndex = currentChatIndex
   // Add click event listeners to history items for deletion
   const allHistoryItems = document.querySelectorAll('.history-item');
@@ -379,21 +383,14 @@ function clearChatHistory() {
             
           // Update currentChatIndex based on the relative position of the deleted chat
       if (previousChatIndex === index) {
+
         if (previousChatIndex > chatHistory.length -1 ){
           currentChatIndex = chatHistory.length-1; // Reset index if the current chat is deleted
 
         } else if (previousChatIndex <= chatHistory.length -1){
           currentChatIndex = previousChatIndex;
         }
-        else if (currentChatIndex === -1) {
-          chatMessages.innerHTML = `<div class="chatbot-message bot-message">No history available. Start a new chat!</div>`;
-          hidePrompts();
-          showPromptButton.classList.add('hidden');
-          sendButton.classList.add('disabled');
-          userInputBox.classList.add('disabled');
-          userInputBox.value = '';
-          newChatButton.focus();
-        }
+      
       } else if (previousChatIndex < index) {
         currentChatIndex = previousChatIndex; // No change if the deleted chat is after the current chat
       } else if (previousChatIndex > index) {
@@ -401,15 +398,21 @@ function clearChatHistory() {
         currentChatIndex = previousChatIndex - 1
       }
 
+      if (chatHistory.length === 0) {
+        startNewChat();        
+      }
           // Update the UI
+          loadChat(currentChatIndex);
+          checkUserMessage();
           refreshHistoryItem();
           updateActiveHistoryItem();
           localStorage.setItem('currentChatIndex', currentChatIndex);
 
           // Remove instruction and cancel button, re-enable the button
           instruction.remove();
-          cancelButton.remove();
+          cancelButton.classList.add('hidden');
           clearHistoryButton.disabled = false;
+          clearAllButton.classList.add('hidden');
 
           // Remove the event listener after the item is deleted
           historyItem.removeEventListener('click', deleteHistoryItem);
@@ -424,13 +427,13 @@ function clearChatHistory() {
   cancelButton.addEventListener('click', function cancelDeletionMode() {
       // Remove instruction and cancel button
       instruction.remove();
-      cancelButton.remove();
+      cancelButton.classList.add('hidden');
       clearHistoryButton.classList.remove('hidden')
+      clearAllButton.classList.add('hidden');
+
       refreshHistoryItem();
       updateActiveHistoryItem();
 
-      // Re-enable the clear history button
-      clearHistoryButton.disabled = false;
 
       // Remove the click event listeners from history items
       allHistoryItems.forEach((historyItem) => {
@@ -438,6 +441,27 @@ function clearChatHistory() {
           historyItem.classList.remove('deletable')
       });
   });
+}
+
+function clearAllHistory() {
+  // Clear chat messages from the chat message div
+  chatMessages.innerHTML = `<div class="chatbot-message bot-message">No history available. Start a new chat!</div>`;
+  
+  // Clear history from the local storage
+  chatHistory = [];
+  localStorage.removeItem('chatHistory');
+  localStorage.removeItem('currentChatIndex');
+
+  // Remove all chat history tab from the sidebar
+  historyContainer.innerHTML = '';
+  
+  startNewChat();
+  checkUserMessage();
+
+  cancelButton.classList.add('hidden');
+  clearAllButton.classList.add('hidden');
+  clearHistoryButton.classList.remove('hidden');
+
 }
 
     
@@ -561,6 +585,8 @@ function clearChatHistory() {
   newChatButton.addEventListener("click", startNewChat);
   
   clearHistoryButton.addEventListener("click", clearChatHistory);
+
+  clearAllButton.addEventListener('click', clearAllHistory)
   
   function checkUserMessage(){
     let hasUserMessage = false;
